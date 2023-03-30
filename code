@@ -1,0 +1,159 @@
+Sub move_files() 'wyszukuje i przenosi określone w arkuszu pliki do innego wskazanego folderu
+
+    Dim FSO As New FileSystemObject
+    Dim fs
+    Dim ile As Variant
+    
+    Set arkusz = ThisWorkbook.Worksheets("Arkusz1")
+    ile = arkusz.Cells(Rows.Count, 1).End(xlUp).Row
+    Set fs = CreateObject("Scripting.FileSystemObject")
+
+    licznik = 0
+    
+    For i = 2 To ile
+    
+    sciezka = arkusz.Cells(9, 6).Value & arkusz.Cells(i, 1) & "." & arkusz.Cells(11, 6)
+    sciezka2 = arkusz.Cells(10, 6).Value & arkusz.Cells(i, 1) & "." & arkusz.Cells(11, 6)
+
+        If fs.FileExists(sciezka) Then
+             FSO.MoveFile sciezka, sciezka2
+             licznik = licznik + 1
+        End If
+        
+    Next
+    
+    MsgBox "Ilość przeniesionych plików: " & licznik, vbOKOnly, "Gotowe"
+    
+End Sub
+
+Sub move_files2() 'wyszukuj i przenosi określone pliki (wyszczególnione prefiksem oraz rozszeżeniem) do innego wskazanego folderu
+
+    Dim sciezka As String
+    Dim plik As String
+    Dim FSO As FileSystemObject
+    
+    Set arkusz = ThisWorkbook.Worksheets("Arkusz1")
+    Set FSO = CreateObject("Scripting.FileSystemObject")
+
+    sciezka = arkusz.Cells(9, 6).Value
+    sciezka2 = arkusz.Cells(10, 6).Value
+    Prefix = arkusz.Cells(12, 6).Value
+    Sufix = arkusz.Cells(11, 6).Value
+    plik = Dir(sciezka & Prefix & "*." & Sufix)
+    
+    licznik = 0
+
+    Do While plik <> ""
+
+        sciezka = arkusz.Cells(9, 6).Value & plik
+        sciezk2 = arkusz.Cells(10, 6).Value & plik
+
+        FSO.MoveFile sciezka, sciezka2
+       
+    plik = Dir
+    licznik = licznik + 1
+    
+    Loop
+    
+    MsgBox "Ilość przeniesionych plików: " & licznik, vbOKOnly, "Gotowe"
+
+End Sub
+
+Sub move_files3() 'wyszukuj i przenosi określone pliki (wyszczególnione identyfikatorem) do innego wskazanego folderu
+
+    Dim sciezka As String
+    Dim plik As String
+    Dim FSO As FileSystemObject
+    
+    Set arkusz = ThisWorkbook.Worksheets("Arkusz1")
+    Set FSO = CreateObject("Scripting.FileSystemObject")
+
+    sciezka = arkusz.Cells(9, 6).Value
+    sciezka2 = arkusz.Cells(10, 6).Value
+    Prefix = arkusz.Cells(12, 6).Value
+    Sufix = arkusz.Cells(11, 6).Value
+    szukana = arkusz.Cells(13, 6).Value
+    plik = Dir(sciezka & Prefix & "*." & Sufix)
+
+    licznik = 0
+
+    Do While plik <> ""       
+
+        If InStr(1, plik, szukana) <> 0 Then
+
+            sciezka = arkusz.Cells(9, 6).Value & plik
+            sciezk2 = arkusz.Cells(10, 6).Value & plik
+            FSO.MoveFile sciezka, sciezka2
+           
+            licznik = licznik + 1
+            
+        End If
+
+    plik = Dir
+
+    Loop
+
+    MsgBox "Ilość przeniesionych plików: " & licznik, vbOKOnly, "Gotowe"
+   
+End Sub 
+
+Sub move_files4() 'wyszukuj i przenosi określone pliki (wyszczególnione różnymi identyfikatorami) do innego wskazanego folderu
+
+    Dim sciezka As String
+    Dim plik, plik2 As String
+    Dim FSO As FileSystemObject
+    
+    Set arkusz = ThisWorkbook.Worksheets("Arkusz1")
+    Set FSO = CreateObject("Scripting.FileSystemObject")
+    
+    ost_wiersz = arkusz.Cells(Rows.Count, 1).End(xlUp).Row
+    sciezka = arkusz.Cells(9, 6).Value
+    sciezka2 = arkusz.Cells(10, 6).Value
+    Prefix = arkusz.Cells(12, 6).Value
+    Sufix = arkusz.Cells(11, 6).Value
+    plik = Dir(sciezka & Prefix & "*." & Sufix)
+    plik2 = Dir(sciezka & "*." & Sufix)
+
+    licznik = 0
+
+    Do While plik2 <> ""
+           
+        For i = 2 To ost_wiersz
+
+            szukana = arkusz.Cells(i, 1).Value
+
+            If InStr(1, plik2, szukana) <> 0 Then
+               
+                sciezka = arkusz.Cells(9, 6).Value & plik2
+                sciezk2 = arkusz.Cells(10, 6).Value & plik2
+
+                FSO.MoveFile sciezka, sciezka2
+                licznik = licznik + 1
+            
+            End If
+
+       Next
+
+    plik2 = Dir   
+
+    Loop
+
+    MsgBox "Ilość przeniesionych plików: " & licznik, vbOKOnly, "Gotowe"
+
+End Sub
+
+Sub move()
+
+    Set arkusz = ThisWorkbook.Worksheets("Arkusz1")   
+
+    If Left(arkusz.Cells(7, 6), 1) = 1 Then
+        Call move_files
+    ElseIf Left(arkusz.Cells(7, 6), 1) = 2 Then
+        Call move_files2
+    ElseIf Left(arkusz.Cells(7, 6), 1) = 3 Then
+        Call move_files3
+    ElseIf Left(arkusz.Cells(7, 6), 1) = 4 Then
+        Call move_files4
+    End If
+
+End Sub
